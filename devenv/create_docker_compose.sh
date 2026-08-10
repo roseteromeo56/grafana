@@ -32,7 +32,7 @@ for file in $grafana_config_file $compose_file $env_file; do
 done
 
 echo "Adding Compose header to $compose_file"
-cat $compose_header_file >> $compose_file
+cat "$compose_header_file" >> "$compose_file"
 
 for dir in $@; do
     current_dir=$blocks_dir/$dir
