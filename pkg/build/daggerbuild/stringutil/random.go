@@ -2,16 +2,19 @@ package stringutil
 
 import (
 	"crypto/rand"
-	"time"
+	"math/big"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-func RandomString(n int) string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func RandomString(n int) (string, error) {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[r.Intn(len(letters))]
+		index, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			return "", err
+		}
+		b[i] = letters[index.Int64()]
 	}
-	return string(b)
+	return string(b), nil
 }

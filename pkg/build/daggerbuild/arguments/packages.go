@@ -25,7 +25,11 @@ var BuildID = pipeline.Argument{
 	ValueFunc: func(ctx context.Context, opts *pipeline.ArgumentOpts) (any, error) {
 		v := opts.CLIContext.String("build-id")
 		if v == "" {
-			v = stringutil.RandomString(8)
+			var err error
+			v, err = stringutil.RandomString(8)
+			if err != nil {
+				return "", err
+			}
 		}
 
 		return v, nil
