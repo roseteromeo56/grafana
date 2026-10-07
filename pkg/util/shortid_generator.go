@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"fmt"
-	"math/rand"
+	"crypto/rand"
 	"regexp"
 	"sync"
 	"time"
