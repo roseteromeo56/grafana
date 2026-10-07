@@ -1,12 +1,12 @@
 package util
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"crypto/rand"
+	"math/big"
 	"regexp"
 	"sync"
-	"time"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/google/uuid"
@@ -14,9 +14,16 @@ import (
 
 const MaxUIDLength = 40
 
-var uidrand = rand.New(rand.NewSource(time.Now().UnixNano()))
 var alphaRunes = []rune("abcdefghijklmnopqrstuvwxyz")
 var hexLetters = []rune("abcdef")
+
+func randomIntN(max int) int {
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	if err != nil {
+		panic(err)
+	}
+	return int(n.Int64())
+}
 
 var (
 	ErrUIDTooLong       = fmt.Errorf("UID is longer than %d symbols", MaxUIDLength)
@@ -55,28 +62,28 @@ func GenerateShortUID() string {
 
 	if node == nil {
 		// ignoring the error happens when input outside 0-1023
-		node, _ = snowflake.NewNode(rand.Int63n(1024))
+		node, _ = snowflake.NewNode(int64(randomIntN(1024)))
 	}
 
 	// Use UUIDs if snowflake failed (should be never)
 	if node == nil {
 		uid, err := uuid.NewRandom()
 		if err != nil {
-			// This should never happen... but this seems better than a panic
+			// If crypto/rand fails, returning a predictable UID is unsafe.
 			for i := range uid {
-				uid[i] = byte(uidrand.Intn(255))
+				uid[i] = byte(randomIntN(255))
 			}
 		}
 		uuid := uid.String()
 		if rune(uuid[0]) < rune('a') {
-			uuid = string(hexLetters[uidrand.Intn(len(hexLetters))]) + uuid[1:]
+			uuid = string(hexLetters[randomIntN(len(hexLetters))]) + uuid[1:]
 		}
 		return uuid
 	}
 
-	return string(hexLetters[uidrand.Intn(len(hexLetters))]) + // start with a letter
+	return string(hexLetters[randomIntN(len(hexLetters))]) + // start with a letter
 		node.Generate().Base36() +
-		string(hexLetters[uidrand.Intn(len(hexLetters))]) // a bit more entropy
+		string(hexLetters[randomIntN(len(hexLetters))]) // a bit more entropy
 }
 
 // ValidateUID checks the format and length of the string and returns error if it does not pass the condition
