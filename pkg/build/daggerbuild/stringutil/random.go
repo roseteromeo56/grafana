@@ -1,7 +1,7 @@
 package stringutil
 
 import (
-	"math/rand"
+	"crypto/rand"
 	"time"
 )
 
