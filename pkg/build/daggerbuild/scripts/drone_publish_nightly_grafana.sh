@@ -12,7 +12,7 @@ dagger run --silent go run ./pkg/build/cmd docker publish \
 
 # Publish packages to the downloads bucket
 dagger run --silent go run ./pkg/build/cmd package publish \
-  $(find $local_dir | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}') \
+  "$(find $local_dir | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}')" \
   --gcp-service-account-key-base64=${GCP_KEY_BASE64} \
   --destination="${DOWNLOADS_DESTINATION}/oss/release"
 
