@@ -41,8 +41,15 @@ dagger run --silent go run ./pkg/build/cmd npm publish \
   --tag="nightly"
 
 # Publish packages to grafana.com
+packages="$(find "$local_dir" | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | grep -v sha256 | grep -v docker | awk '{print "--package=file://"$0}')"
+IFS='
+'
+set -f
+set -- $packages
+set +f
+unset IFS
 dagger run --silent go run ./pkg/build/cmd gcom publish \
-  $(find $local_dir | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | grep -v sha256 | grep -v docker | awk '{print "--package=file://"$0}') \
+  "$@" \
   --api-key=${GCOM_API_KEY} \
   --api-url="https://grafana.com/api/grafana" \
   --download-url="https://dl.grafana.com/oss/release" \
