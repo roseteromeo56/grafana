@@ -11,8 +11,14 @@ dagger run --silent go run ./pkg/build/cmd docker publish \
   --repo="grafana-dev"
 
 # Publish packages to the downloads bucket
+IFS='
+'
+set -f
+set -- $(find "$local_dir" | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}')
+set +f
+unset IFS
 dagger run --silent go run ./pkg/build/cmd package publish \
-  "$(find $local_dir | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}')" \
+  "$@" \
   --gcp-service-account-key-base64=${GCP_KEY_BASE64} \
   --destination="${DOWNLOADS_DESTINATION}/oss/release"
 
