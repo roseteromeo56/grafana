@@ -14,7 +14,7 @@ dagger run --silent go run ./pkg/build/cmd docker publish \
 IFS='
 '
 set -f
-set -- $(find "$local_dir" | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}')
+set -- "$(find "$local_dir" | grep -e .rpm -e .tar.gz -e .exe -e .zip -e .deb | awk '{print "--package=file://"$0}')"
 set +f
 unset IFS
 dagger run --silent go run ./pkg/build/cmd package publish \
